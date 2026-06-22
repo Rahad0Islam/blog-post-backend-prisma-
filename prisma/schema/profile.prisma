@@ -3,8 +3,8 @@ model Profile {
     profilePhoto String?
     bio          String?
 
-    useriId String @unique
-    user    User   @relation(fields: [useriId], references: [id])
+    userId String @unique
+    user    User   @relation(fields: [userId], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
