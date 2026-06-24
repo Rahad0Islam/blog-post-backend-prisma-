@@ -4,6 +4,7 @@ import cors from "cors";
 import config from "./config/config";
 import { prisma } from "./lib/prisma";
 import { userRoutes } from "./module/user/user.route";
+import { authRouter } from "./module/auth/auth.route";
 
 
 const app: Application = express();
@@ -25,5 +26,6 @@ app.get("/", async (req, res) => {
 });
 
 app.use("/api/users",userRoutes);
+app.use('/api/auth',authRouter);
 
 export default app;

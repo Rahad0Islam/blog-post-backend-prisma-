@@ -1,37 +1,35 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { prisma } from "../../lib/prisma";
 import bcrypt from 'bcrypt'
 import config from "../../config/config";
 import httpstatus from "http-status";
 import { userService } from "./user.service";
+import { asyncHandler } from "../../utils/utils";
+import { sendResponse } from "../../utils/sendResponse";
 
 
-const userCreate = async (req: Request, res: Response) => {
-  const payload = req.body;
-  // console.log(payload);
-try {
-      const user = await userService.registerIntoDb(payload);
-    
-     
-      res.status(httpstatus.CREATED).json({
-        sucess:true,
-        statusCode:httpstatus.CREATED, 
-        message: "register succesfully " ,
+
+
+
+const userCreate = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+       const payload = req.body;
+      //  console.log(payload);
+        const user = await userService.registerIntoDb(payload);
+
+      return sendResponse(res,{
+        success:true,
+        statuscode:httpstatus.CREATED,
+        message:"register successfully",
         data:user
-      
-      });
-} catch (error:any) {
-    console.log(error);
-    res.status(httpstatus.INTERNAL_SERVER_ERROR).json({
-        sucess:false,
-        statusCode:httpstatus.INTERNAL_SERVER_ERROR, 
-        message: "register failed " ,
-        error:error.message
-    })
-}
-}
+      })
+})
+
+const getMyProfile = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+     res.send("get my profile")
+})
 
 
 export const userController ={
-    userCreate
+    userCreate,
+    getMyProfile
 }
