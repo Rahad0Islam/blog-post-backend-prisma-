@@ -1,3 +1,4 @@
+import { commentStatus } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import { createPostPayload, IupdatedPost } from "./post.interface";
 
@@ -59,19 +60,32 @@ const getMypostFromDb = async(authorId:string)=>{
 }
 
 const getPostByid = async(postId:string)=>{
-    const post = await prisma.post.findUniqueOrThrow({
+    // const post = await prisma.post.findUniqueOrThrow({
+    //     where:{
+    //         id:postId
+    //     }
+    // })
+ 
+
+    const transaction = prisma.$transaction(async(tx)=>{
+
+       await tx.post.update({
         where:{
             id:postId
-        }
-    })
-    const updatedpost =  await prisma.post.update({
-        where:{
-            id:post.id
         },
         data:{
             views:{
                 increment:1
             }
+        }
+        
+    })
+
+    // throw new Error("fake error")
+
+   const post =  await tx.post.findUniqueOrThrow({
+        where:{
+            id:postId
         },
         include:{
             author:{
@@ -79,11 +93,31 @@ const getPostByid = async(postId:string)=>{
                     password:true
                 }
             },
-            comments:true
-        },
+            comments:{
+                where:{
+                    status:commentStatus.APPROVED
+                },
+                orderBy:{
+                    createdAt:"desc"
+                },
+                
+            },
+            _count:{
+                select:{
+                    comments:true
+                }
+            }
+        }
     })
+
+    return post;
+
+    })
+
+
+    return transaction;
     
-    return updatedpost;
+  
 }
 
 const updatePost = async(postId:string,payload:IupdatedPost,authorId:string,isAdmin:boolean)=>{
