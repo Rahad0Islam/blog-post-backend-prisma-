@@ -6,7 +6,8 @@ import httpstatus from "http-status";
 import { userService } from "./user.service";
 import { asyncHandler } from "../../utils/utils";
 import { sendResponse } from "../../utils/sendResponse";
-
+import jwt from 'jsonwebtoken'
+import { jwtUtils } from "../../utils/jwtutils";
 
 
 
@@ -25,7 +26,31 @@ const userCreate = asyncHandler(async(req:Request,res:Response,next:NextFunction
 })
 
 const getMyProfile = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-     res.send("get my profile")
+     const {accessToken} = req.cookies;
+
+     const verified = jwtUtils.verifyToken(accessToken, config.jwt_access_secret);
+
+     if (!verified || (verified as any).success === false) {
+       const err = (verified as any)?.error ?? 'Invalid token';
+       throw new Error(err);
+     }
+
+     const payload = verified.data as jwt.JwtPayload | string;
+     if (typeof payload === 'string') {
+       throw new Error('Invalid token payload');
+     }
+
+     const user = await userService.getProfileFromDb(payload.id as string);
+     console.log(user)
+     
+     return sendResponse(res,{
+       success:true,
+       statuscode:httpstatus.OK,
+       message:"profile fetch successfully ",
+       data:{
+        user
+       }
+     })
 })
 
 

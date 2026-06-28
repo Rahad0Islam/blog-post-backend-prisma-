@@ -3,21 +3,22 @@ import { asyncHandler } from "../../utils/utils";
 import { authService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpstatus from "http-status"
+import { userService } from "../user/user.service";
 
 
 const loginUser = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
        const payload = req.body;
 
-       const {accessToken , refressToken} =await authService.loginUserDb(payload);
+       const {accessToken , refreshToken} =await authService.loginUserDb(payload);
        
-       res.cookie("accesstoken",accessToken,{
+       res.cookie("accessToken",accessToken,{
          httpOnly:true,
          secure:false,
          sameSite:"none",
          maxAge:1000* 60 * 60 * 24 
        })
 
-        res.cookie("refresstoken",refressToken,{
+        res.cookie("refreshToken",refreshToken,{
          httpOnly:true,
          secure:false,
          sameSite:"none",
@@ -29,10 +30,27 @@ const loginUser = asyncHandler(async(req:Request,res:Response,next:NextFunction)
         success:true,
          statuscode:httpstatus.OK,
          message:"Log in successfully",
-         data:{accessToken , refressToken}
+         data:{accessToken , refreshToken}
        })
 })
 
+
+const refreshToken = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    
+  const refreshToken = req.cookies.refreshToken;
+
+  const result = authService.refreshToken(refreshToken);
+
+  return sendResponse(res,{
+        success:true,
+         statuscode:httpstatus.OK,
+         message:"token refresh successfully",
+         data: result
+       })
+  
+
+})
 export const authController = {
-    loginUser
+    loginUser,
+    refreshToken
 }

@@ -3,7 +3,7 @@ import { prisma } from "../../lib/prisma"
 import { jwtUtils } from "../../utils/jwtutils"
 import { loginPayload } from "./auth.interface"
 import bcrypt from 'bcrypt'
-import jwt, { SignOptions } from "jsonwebtoken"
+import jwt, { JsonWebTokenError, SignOptions } from "jsonwebtoken"
 
 const loginUserDb = async(payload:loginPayload)=>{
     const {email,password} = payload;
@@ -21,24 +21,29 @@ const loginUserDb = async(payload:loginPayload)=>{
     const jwtPayload = {
         id : user.id,
         name : user.name,
-        role : user.name,
+        role : user.role,
         email : user.email
 
     }
 
    
     const accessToken = jwtUtils.token(jwtPayload,config.jwt_access_secret,config.jwt_access_expires_in as SignOptions);
-    const refressToken = jwtUtils.token(jwtPayload,config.jwt_refresh_secret,config.jwt_refresh_expires_in as SignOptions);
+    const refreshToken = jwtUtils.token(jwtPayload,config.jwt_refresh_secret,config.jwt_refresh_expires_in as SignOptions);
   
 
     return {
         accessToken,
-        refressToken
+        refreshToken
     }
   
 }
 
+const refreshToken = (payload:string)=>{
+    
+     const res = jwtUtils.verifyToken(payload,config.jwt_refresh_secret);
 
+}
 export const authService = {
-    loginUserDb
+    loginUserDb,
+    refreshToken
 }
