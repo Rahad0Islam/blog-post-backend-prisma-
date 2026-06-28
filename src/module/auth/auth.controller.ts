@@ -36,16 +36,24 @@ const loginUser = asyncHandler(async(req:Request,res:Response,next:NextFunction)
 
 
 const refreshToken = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    
+  
   const refreshToken = req.cookies.refreshToken;
-
-  const result = authService.refreshToken(refreshToken);
+  
+  const accessToken =await authService.refreshToken(refreshToken);
+  console.log("first")
+  
+  res.cookie("accessToken",accessToken,{
+        httpOnly:true,
+        secure:false,
+        sameSite:"none",
+        maxAge:1000* 60 * 60 * 24 
+      })
 
   return sendResponse(res,{
         success:true,
          statuscode:httpstatus.OK,
          message:"token refresh successfully",
-         data: result
+         data: {accessToken}
        })
   
 
