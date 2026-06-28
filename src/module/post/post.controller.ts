@@ -104,13 +104,24 @@ const updatedPost = asyncHandler(async(req:Request,res:Response,next:NextFunctio
 
 })
 
+const statistics = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+     const stats = await postService.getPostStats();
 
+      return sendResponse(res,{
+        success:true,
+        statuscode:httpstatus.OK,
+        message:" post statics retrieved succesfully",
+        data:stats
+
+      })
+})
 export const postController ={
     getAllPosts,
     createPost,
     getMypost,
     getPostById,
     deletePost,
-    updatedPost
+    updatedPost,
+    statistics
 
 }
