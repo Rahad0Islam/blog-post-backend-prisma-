@@ -4,14 +4,16 @@ import { postService } from "./post.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpstatus from 'http-status'
 import { Role } from "../../../generated/prisma/enums";
+import { IpostSearchQuery } from "./post.interface";
 
 const getAllPosts = asyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
      
-    const allPost = await postService.getAllPostsFromDb();
+    const query = req.query;
+    const allPost = await postService.getAllPostsFromDb(query);
     
      return sendResponse(res,{
         success:true,
-        statuscode:httpstatus.CREATED,
+        statuscode:httpstatus.OK,
         message:"all posts fetched Succesfully",
         data:allPost
 
