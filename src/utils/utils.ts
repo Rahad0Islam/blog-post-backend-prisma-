@@ -6,13 +6,7 @@ export const asyncHandler = (fn : RequestHandler)=>{
           await fn(req,res,next);
         } catch (error:any) {
 
-        console.log(error);
-        res.status(httpstatus.INTERNAL_SERVER_ERROR).json({
-        sucess:false,
-        statusCode:httpstatus.INTERNAL_SERVER_ERROR, 
-        message: "register failed " ,
-        error:error.message
-    })
+        next(error);
     }
 }
 }
