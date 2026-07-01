@@ -10,6 +10,7 @@ import { commentRouter } from "./module/comment/comment.router";
 import { notFoundMiddleware } from "./middleware/notfound";
 import httpstatus from "http-status";
 import { globalerrorhandler } from "./middleware/globalErorHandler";
+import { subscriptionRouter } from "./module/subscription/subscription.router";
 
 const app: Application = express();
 app.use(
@@ -29,10 +30,13 @@ app.get("/", async (req, res) => {
   res.send("Hello World!");
 });
 
+
 app.use("/api/users",userRoutes);
 app.use('/api/auth',authRouter);
 app.use('/api/posts',postRoute);
 app.use('/api/comments',commentRouter)
+app.use('/api/subscription',subscriptionRouter);
+
 app.use(notFoundMiddleware);
 
 app.use(globalerrorhandler);
